@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Pedido } from './pedido.entity';
@@ -25,6 +25,19 @@ export class PedidosService {
       where: { id },
       relations: ['items'],
     });
+  }
+
+  async obtenerPorIdYEmail(id: number, email: string) {
+    const pedido = await this.pedidoRepo.findOne({
+      where: { id, clienteEmail: email },
+      relations: ['items'],
+    });
+
+    if (!pedido) {
+      throw new NotFoundException('Pedido no encontrado o email no coincide');
+    }
+
+    return pedido;
   }
 
   async actualizarEstado(id: number, estado: string) {

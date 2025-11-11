@@ -9,16 +9,22 @@ import {
   Res,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { ConfigService } from '@nestjs/config';
+import { memoryStorage } from 'multer';
 import { CollectionsService } from './collections.service';
 import { Response } from 'express';
 
-@Controller('collections')
+@Controller('api/config')
 export class CollectionsController {
-  constructor(private collectionsService: CollectionsService) {}
+  constructor(
+    private collectionsService: CollectionsService,
+    private configService: ConfigService,
+  ) {}
 
-  @Post('upload')
+  @Post('colecciones')
   @UseInterceptors(
     FilesInterceptor('files', 3, {
+      storage: memoryStorage(),
       limits: { fileSize: 5 * 1024 * 1024 },
       fileFilter: (req, file, cb) => {
         if (!file.mimetype.startsWith('image/')) {
@@ -30,6 +36,10 @@ export class CollectionsController {
     }),
   )
   async uploadImages(@UploadedFiles() files: any[]) {
+    if (!files || files.length === 0) {
+      throw new BadRequestException('No se adjuntaron archivos');
+    }
+
     const categories = ['maquillajes', 'perfumes', 'accesorios'];
     const results: any[] = [];
 
@@ -45,7 +55,21 @@ export class CollectionsController {
     return { message: 'Imágenes subidas exitosamente', data: results };
   }
 
-  @Get('images/:category')
+  @Get('colecciones')
+  async getAllImages(@Res() res: Response) {
+    const images = await this.collectionsService.getAllImages();
+    const apiUrl = this.configService.get<string>('API_URL') || 'http://localhost:3000/api';
+
+    const response = images.map(img => ({
+      category: img.category,
+      imageName: img.imageName,
+      imageUrl: `${apiUrl}/config/colecciones/${img.category}`,
+    }));
+
+    res.json(response);
+  }
+
+  @Get('colecciones/:category')
   async getImage(@Param('category') category: string, @Res() res: Response) {
     const image = await this.collectionsService.getImage(category);
     if (!image) {
@@ -54,18 +78,5 @@ export class CollectionsController {
 
     res.set('Content-Type', 'image/jpeg');
     res.send(image.imageData);
-  }
-
-  @Get('images')
-  async getAllImages(@Res() res: Response) {
-    const images = await this.collectionsService.getAllImages();
-    
-    const response = images.map(img => ({
-      category: img.category,
-      imageName: img.imageName,
-      imageUrl: `http://localhost:3000/collections/images/${img.category}`
-    }));
-
-    res.json(response);
   }
 }

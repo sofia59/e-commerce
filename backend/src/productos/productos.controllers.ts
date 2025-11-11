@@ -45,4 +45,9 @@ export class ProductosController {
   async obtenerPublicoPorId(@Param('id') id: number) {
     return this.productosService.obtenerPublicoPorId(id);
   }
+
+  @Post('productos/validar-stock')
+  async validarStock(@Body() body: { items: any[] }) {
+    return this.productosService.validarStock(body.items);
+  }
 }

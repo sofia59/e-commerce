@@ -9,6 +9,7 @@ import Cart from './tienda/components/Cart';
 import AdminApp from './admin/AdminApp';
 import OrderStatusPage from './tienda/pages/OrderStatusPage';
 import Navbar from './tienda/components/Navbar';
+import Toast from './tienda/components/Toast';
 import "./App.css";
 
 export default function App() {
@@ -19,12 +20,15 @@ export default function App() {
 
   const [cartOpen, setCartOpen] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
+  const [toast, setToast] = useState(null);
 
   useEffect(() => {
     localStorage.setItem('carrito', JSON.stringify(carrito));
   }, [carrito]);
 
   function agregarAlCarrito(producto) {
+    const existe = carrito.find((item) => item.id === producto.id);
+    
     setCarrito((prev) => {
       const existe = prev.find((item) => item.id === producto.id);
       if (existe) {
@@ -33,6 +37,11 @@ export default function App() {
         );
       }
       return [...prev, { ...producto, cantidad: 1 }];
+    });
+
+    setToast({
+      message: `✨ "${producto.nombre}" agregado al carrito`,
+      type: 'success',
     });
   }
 
@@ -46,6 +55,15 @@ export default function App() {
         carritoCount={carrito.length} 
         onCartClick={() => setCartOpen(true)}
       />
+      
+      {/* ✅ Toast Notification */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
       
       <Cart
         items={carrito}
@@ -65,7 +83,10 @@ export default function App() {
           onSuccess={() => {
             setCarrito([]);
             setShowCheckout(false);
-            alert('¡Gracias por tu compra!');
+            setToast({
+              message: '🎉 ¡Gracias por tu compra!',
+              type: 'success',
+            });
           }}
         />
       )}

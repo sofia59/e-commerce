@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -26,18 +26,18 @@ export const productosAPI = {
   eliminar: (id) => api.delete(`/admin/productos/${id}`),
   obtenerPublicos: () => api.get('/productos'),
   obtenerPublicoPorId: (id) => api.get(`/productos/${id}`),
+  validarStock: (items) => api.post('/productos/validar-stock', { items }),
 };
 
 export const pedidosAPI = {
-  obtenerTodos: () => api.get('/admin/pedidos'),
-  obtenerPorId: (id) => api.get(`/admin/pedidos/${id}`),
-  actualizarEstado: (id, estado) => api.put(`/admin/pedidos/${id}`, { estado }),
+  obtenerTodos: () => api.get('/pedidos'),
+  obtenerPorId: (id) => api.get(`/pedidos/admin/${id}`),
+  actualizarEstado: (id, estado) => api.put(`/pedidos/admin/${id}`, { estado }),
+  obtenerPorIdPublico: (id, email) => api.get(`/pedidos/public/${id}?email=${email}`),
   crear: (data) => api.post('/pedidos', data),
 };
 
 export const configAPI = {
-  obtenerCarousel: () => api.get('/config/carousel'),
-  guardarCarousel: (imagenes) => api.post('/config/carousel', { imagenes }),
   obtenerColecciones: () => api.get('/config/colecciones'),
   guardarColecciones: (data) => api.post('/config/colecciones', data),
 };

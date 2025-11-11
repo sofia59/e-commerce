@@ -1,31 +1,54 @@
-import { Controller, Get, Post, Put, Param, Body, UseGuards } from '@nestjs/common';
-import { PedidosService } from './pedidos.service';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Param,
+  Body,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { PedidosService } from './pedidos.service';
 
-@Controller('api')
+@Controller('api/pedidos')
 export class PedidosController {
   constructor(private pedidosService: PedidosService) {}
 
+  @Get('public/:id')
+  async obtenerPorIdPublico(
+    @Param('id') id: number,
+    @Query('email') email?: string,
+  ) {
+    if (email) {
+      return this.pedidosService.obtenerPorIdYEmail(id, email);
+    }
+    return this.pedidosService.obtenerPorId(id);
+  }
+
+  @Post()
+  async crearPedido(@Body() data: any) {
+    return this.pedidosService.crear(data);
+  }
+
+  @Get()
   @UseGuards(JwtAuthGuard)
-  @Get('admin/pedidos')
   async obtenerTodos() {
     return this.pedidosService.obtenerTodos();
   }
 
+  @Get('admin/:id')
   @UseGuards(JwtAuthGuard)
-  @Get('admin/pedidos/:id')
-  async obtenerPorId(@Param('id') id: number) {
+  async obtenerPorIdAdmin(@Param('id') id: number) {
     return this.pedidosService.obtenerPorId(id);
   }
 
+  @Put('admin/:id')
   @UseGuards(JwtAuthGuard)
-  @Put('admin/pedidos/:id')
-  async actualizarEstado(@Param('id') id: number, @Body() body: { estado: string }) {
-    return this.pedidosService.actualizarEstado(id, body.estado);
-  }
-
-  @Post('pedidos')
-  async crear(@Body() data: any) {
-    return this.pedidosService.crear(data);
+  async actualizarEstado(
+    @Param('id') id: number,
+    @Body() data: { estado: string },
+  ) {
+    return this.pedidosService.actualizarEstado(id, data.estado);
   }
 }

@@ -6,10 +6,10 @@ export class CollectionImage {
   id: number;
 
   @Column({ unique: true })
-  category: string; // maquillajes, perfumes, accesorios
+  category: string;
 
   @Column({ type: 'longblob', nullable: true })
-  imageData: Buffer; // Almacena la imagen como bytes
+  imageData: Buffer; 
 
   @Column({ nullable: true })
   imageName: string;

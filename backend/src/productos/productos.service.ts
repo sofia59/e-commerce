@@ -103,4 +103,62 @@ export class ProductosService {
   async obtenerPublicoPorId(id: number) {
     return this.productoRepo.findOne({ where: { id, activo: 1 } });
   }
+
+  async validarStock(items: any[]) {
+    const resultado: any = {
+      valido: true,
+      items: [],
+    };
+
+    for (const item of items) {
+      const producto = await this.productoRepo.findOne({
+        where: { id: item.productoId },
+      });
+
+      if (!producto) {
+        resultado.valido = false;
+        resultado.items.push({
+          productoId: item.productoId,
+          solicitado: item.cantidad,
+          disponible: 0,
+          mensaje: 'Producto no encontrado',
+        });
+        continue;
+      }
+
+      if (producto.stock < item.cantidad) {
+        resultado.valido = false;
+        resultado.items.push({
+          productoId: item.productoId,
+          nombre: producto.nombre,
+          solicitado: item.cantidad,
+          disponible: producto.stock,
+          mensaje: `Solo hay ${producto.stock} disponibles`,
+        });
+      } else {
+        resultado.items.push({
+          productoId: item.productoId,
+          nombre: producto.nombre,
+          solicitado: item.cantidad,
+          disponible: producto.stock,
+          valido: true,
+        });
+      }
+    }
+
+    return resultado;
+  }
+
+  async descontarStock(items: any[]) {
+    for (const item of items) {
+      const producto = await this.productoRepo.findOne({
+        where: { id: item.productoId },
+      });
+      if (producto) {
+        await this.productoRepo.update(item.productoId, {
+          stock: producto.stock - item.cantidad,
+        });
+      }
+    }
+  }
 }

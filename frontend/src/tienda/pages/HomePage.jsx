@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import { configAPI } from '../../services/api';
 
 export default function HomePage() {
   const [images, setImages] = useState({
@@ -13,7 +13,7 @@ export default function HomePage() {
   useEffect(() => {
     const fetchImages = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/collections/images');
+        const response = await configAPI.obtenerColecciones();
         const imageMap = {};
         
         response.data.forEach(img => {
@@ -33,7 +33,6 @@ export default function HomePage() {
 
   return (
     <div className="home-page">
-      {/* Hero Section */}
       <section className="hero-main">
         <div className="hero-content">
           <h1>Cuidado Premium para tu Piel</h1>
@@ -44,7 +43,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Sección de Categorías */}
       <section className="categories-section">
         <h2>Nuestras Colecciones</h2>
         <div className="categories-grid">
@@ -92,7 +90,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Sección de Beneficios */}
       <section className="benefits-section">
         <div className="benefit">
           <h3>✨ Calidad Premium</h3>

@@ -3,6 +3,7 @@ import { pedidosAPI } from '../../services/api';
 
 export default function OrderStatusPage() {
   const [pedidoId, setPedidoId] = useState('');
+  const [email, setEmail] = useState('');
   const [pedido, setPedido] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -13,10 +14,10 @@ export default function OrderStatusPage() {
     setLoading(true);
 
     try {
-      const response = await pedidosAPI.obtenerPorId(parseInt(pedidoId));
+      const response = await pedidosAPI.obtenerPorIdPublico(parseInt(pedidoId), email);
       setPedido(response.data);
     } catch (err) {
-      setError('Pedido no encontrado');
+      setError('Pedido no encontrado o email no coincide');
       setPedido(null);
     } finally {
       setLoading(false);
@@ -29,15 +30,28 @@ export default function OrderStatusPage() {
         <h2>Seguimiento de Pedidos</h2>
 
         <form onSubmit={handleBuscar} className="search-form">
-          <input
-            type="number"
-            placeholder="Ingresa el número de tu pedido"
-            value={pedidoId}
-            onChange={(e) => setPedidoId(e.target.value)}
-            required
-          />
-          <button type="submit" disabled={loading}>
-            {loading ? 'Buscando...' : 'Buscar'}
+          <div className="form-group">
+            <input
+              type="number"
+              placeholder="Ingresa el número de tu pedido"
+              value={pedidoId}
+              onChange={(e) => setPedidoId(e.target.value)}
+              required
+            />
+          </div>
+          
+          <div className="form-group">
+            <input
+              type="email"
+              placeholder="Ingresa tu email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+
+          <button type="submit" disabled={loading || !pedidoId || !email}>
+            {loading ? 'Buscando...' : 'Buscar Pedido'}
           </button>
         </form>
 
@@ -69,7 +83,7 @@ export default function OrderStatusPage() {
             </div>
 
             <div className={`status-badge status-${pedido.estado}`}>
-                 Estado: <strong>{pedido.estado.toUpperCase()}</strong>
+              Estado: <strong>{pedido.estado.toUpperCase()}</strong>
             </div>
 
             <div className="order-items">
@@ -84,14 +98,20 @@ export default function OrderStatusPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {pedido.items.map((item) => (
-                    <tr key={item.id}>
-                      <td>#{item.productoId}</td>
-                      <td>{item.cantidad}</td>
-                      <td>${parseFloat(item.precioUnitario).toFixed(2)}</td>
-                      <td>${(parseFloat(item.precioUnitario) * item.cantidad).toFixed(2)}</td>
+                  {pedido.items && pedido.items.length > 0 ? (
+                    pedido.items.map((item) => (
+                      <tr key={item.id}>
+                        <td>#{item.productoId}</td>
+                        <td>{item.cantidad}</td>
+                        <td>${parseFloat(item.precioUnitario).toFixed(2)}</td>
+                        <td>${(parseFloat(item.precioUnitario) * item.cantidad).toFixed(2)}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="4">No hay items en este pedido</td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>

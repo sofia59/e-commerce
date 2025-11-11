@@ -2,9 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CollectionImage } from './collection-image.entity';
-import * as fs from 'fs';
-import * as path from 'path';
-import { Express } from 'express';
 
 @Injectable()
 export class CollectionsService {
