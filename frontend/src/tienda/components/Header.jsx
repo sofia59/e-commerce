@@ -21,15 +21,6 @@ export default function Header({ cartCount, onCartClick }) {
           <ul className="nav-links">
             <li><Link to="/">Inicio</Link></li>
             <li><Link to="/shop">Todos los Productos</Link></li>
-            
-            <li className="dropdown">
-              <span>Categorías</span>
-              <div className="dropdown-menu">
-                <button onClick={() => handleCategoryClick('Maquillajes')}>💄 Maquillajes</button>
-                <button onClick={() => handleCategoryClick('Perfumes')}>🌸 Perfumes</button>
-                <button onClick={() => handleCategoryClick('Accesorios')}>✨ Accesorios</button>
-              </div>
-            </li>
           </ul>
 
           <div className="nav-icons">

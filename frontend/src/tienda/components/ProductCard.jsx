@@ -4,9 +4,7 @@ export default function ProductCard({ product, onAddCart }) {
   const precioActual = parseFloat(product.precio) || 0;
   const precioOriginal = parseFloat(product.precioOriginal) || 0;
   
-  const descuento = precioOriginal > 0
-    ? Math.round((1 - precioActual / precioOriginal) * 100)
-    : 0;
+
 
   return (
     <div className="product-card">
@@ -17,7 +15,6 @@ export default function ProductCard({ product, onAddCart }) {
           ) : (
             <div className="product-image-placeholder">💅</div>
           )}
-          {descuento > 0 && <span className="badge">-{descuento}%</span>}
         </div>
       </Link>
 
@@ -59,7 +56,7 @@ export default function ProductCard({ product, onAddCart }) {
             }}
             className="btn-view-detail"
           >
-            👁️ Ver Detalle
+            Ver Detalle
           </Link>
 
           <button
